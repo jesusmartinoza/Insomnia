@@ -78,7 +78,7 @@ struct StatusRootView: View {
                         .animation(Motion.base(reduceMotion: reduceMotion), value: model.startErrorShown)
                 }
             } else if showsCountdown {
-                countdown
+                if manager.config.showCountdown { countdown }
                 if showsRunningControls {
                     HoldToEndButton(reduceMotion: reduceMotion, action: onHoldEnd)
                         .transition(Motion.ringTransition(reduceMotion: reduceMotion))

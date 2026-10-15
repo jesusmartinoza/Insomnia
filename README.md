@@ -1,3 +1,7 @@
+> **Personal fork — quick presets:** click the menu-bar icon to start a preset, extend an active session, enter a custom duration, or end the session. “Show countdown” toggles the menu-bar timer and persists across launches (hidden by default). The remaining time is always available in the active-session menu. Edit presets in Settings.
+>
+> Based on upstream v0.1.0. Keep the original repository as the `upstream` remote; review and merge upstream changes into `feat/quick-presets`, then run `swift test` and `swift build -c release`. Upstream downloads do not contain these customizations.
+
 <p align="center">
   <img src="docs/assets/eye-moon.svg" alt="Insomnia: an eye with a right-opening crescent moon" width="112">
 </p>
@@ -33,9 +37,7 @@
 > download. Recovery can fail; a running timer is not a safety guarantee.
 > [Validation status](docs/release-validation.md) · [Apple's ventilation guidance](https://support.apple.com/en-us/102336)
 
-<p align="center">
-  <img src="docs/assets/session-flow.svg" alt="Illustrated menu-bar controls: enter Days, Hours, and Minutes, watch the countdown, and hold the end control to finish early. Click the eye or countdown to add time. Closing the lid is optional, and incomplete recovery needs attention." width="880">
-</p>
+
 
 ## Install
 
@@ -107,11 +109,13 @@ removes Insomnia again.
 
 ## Using it
 
-1. **Start:** click the eye in the menu bar, enter Days / Hours / Minutes, and
-   press Enter.
-2. **Extend:** click the eye or countdown during a session and enter more time.
-3. **End early:** press and hold the end control beside the countdown.
-4. **Inspect or configure:** right-click for status, recovery warnings,
+1. **Start:** click the eye and select a preset, or choose **Custom duration…**,
+   enter Days / Hours / Minutes, and press Enter or click the eye to confirm.
+2. **Extend:** select **Extend by…** from the eye menu, or use **Custom duration…**.
+3. **End early:** select **End session** from the eye menu.
+4. **Counter:** toggle **Show countdown** in the menu or Settings. Remaining time
+   is also shown inside the active-session menu.
+5. **Inspect or configure:** either click opens status, recovery warnings,
    **Settings**, and **Quit Insomnia**. Quitting requests session cleanup and
    can be refused while required recovery remains.
 

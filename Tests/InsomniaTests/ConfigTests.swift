@@ -25,6 +25,7 @@ final class ConfigTests: XCTestCase {
         XCTAssertEqual(c.hotspotSSID, "")
         XCTAssertEqual(c.tmuxTargets, [])
         XCTAssertFalse(c.launchAtLogin)
+        XCTAssertFalse(c.showCountdown)
     }
 
     func testPartialJSONFillsDefaults() throws {
@@ -95,6 +96,7 @@ final class ConfigTests: XCTestCase {
         c.hotspotSSID = "iPhone"
         c.tmuxTargets = ["main:0.1"]
         c.presets = [60]
+        c.showCountdown = true
         let data = try Store.makeEncoder().encode(c)
         XCTAssertEqual(try Store.makeDecoder().decode(Config.self, from: data), c)
     }

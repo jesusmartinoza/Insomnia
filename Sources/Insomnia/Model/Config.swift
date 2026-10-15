@@ -47,6 +47,7 @@ struct Config: Codable, Equatable, Sendable {
 
     // App
     var launchAtLogin: Bool = false
+    var showCountdown: Bool = false
 
     static let defaultPresets: [TimeInterval] = [
         30 * 60,
@@ -112,6 +113,7 @@ struct Config: Codable, Equatable, Sendable {
         hotspotSSID = try c.decodeIfPresent(String.self, forKey: .hotspotSSID) ?? d.hotspotSSID
         nudgeThreshold = try c.decodeIfPresent(TimeInterval.self, forKey: .nudgeThreshold) ?? d.nudgeThreshold
         tmuxTargets = try c.decodeIfPresent([String].self, forKey: .tmuxTargets) ?? d.tmuxTargets
+        showCountdown = try c.decodeIfPresent(Bool.self, forKey: .showCountdown) ?? d.showCountdown
         launchAtLogin = try c.decodeIfPresent(Bool.self, forKey: .launchAtLogin) ?? d.launchAtLogin
     }
 }

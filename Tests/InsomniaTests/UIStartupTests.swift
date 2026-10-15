@@ -32,6 +32,7 @@ final class UIStartupTests: XCTestCase {
             _ = NSApplication.shared
             h = Harness()
             manager = h.makeManager()
+            manager.config.showCountdown = true
             controller = StatusItemController(manager: manager, status: PlaceholderStatus(), showSettings: {})
         }
 

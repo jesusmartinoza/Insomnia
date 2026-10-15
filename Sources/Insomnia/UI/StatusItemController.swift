@@ -95,7 +95,10 @@ final class StatusItemController: NSObject {
         let root = StatusRootView(
             model: model,
             manager: manager,
-            onTapIcon: { [weak self] in self?.iconTapped() },
+            onTapIcon: { [weak self] in
+                guard let self else { return }
+                if self.model.phase.isEntering { self.iconTapped() } else { self.showMenu() }
+            },
             onTapPill: { [weak self] field in self?.focus(field) },
             onTapCountdown: { [weak self] in self?.customExtend() },
             onHoldEnd: { [weak self] in self?.holdToEnd() },
@@ -624,6 +627,7 @@ final class StatusItemController: NSObject {
     /// `statusItem.menu`, which would swallow the left click the pills need.
     private func showMenu() {
         guard let button else { return }
+        if model.phase.isEntering { collapse() }
         // The lid, the battery and the watts are read right here, so the menu
         // opens on what the machine is doing now. The SSID and the throttled
         // browser list are whatever the last scan found: both have to be
@@ -639,7 +643,63 @@ final class StatusItemController: NSObject {
             quit: #selector(menuQuit),
             relaunchBrowser: #selector(menuRelaunchBrowser(_:))
         )
+        addSessionControls(to: menu)
         menu.popUp(positioning: nil, at: NSPoint(x: 0, y: button.bounds.height + 4), in: button)
+    }
+
+    func addSessionControls(to menu: NSMenu) {
+        var entries: [NSMenuItem] = []
+        func action(_ title: String, _ selector: Selector) -> NSMenuItem {
+            let item = NSMenuItem(title: title, action: selector, keyEquivalent: "")
+            item.target = self
+            return item
+        }
+        if manager.isActive {
+            let remaining = NSMenuItem(title: "Remaining: \(manager.countdownText)", action: nil, keyEquivalent: "")
+            remaining.isEnabled = false
+            entries.append(remaining)
+            entries.append(action("End session", #selector(menuEndSession)))
+            entries.append(.separator())
+        }
+        for duration in manager.config.presets where duration.isFinite && duration > 0 && duration <= manager.config.maxDuration {
+            let title = (manager.isActive ? "Extend by " : "Stay awake for ") + chipLabel(for: duration)
+            let item = action(title, #selector(menuPreset(_:)))
+            item.representedObject = NSNumber(value: duration)
+            item.isEnabled = model.phase != .starting
+            entries.append(item)
+        }
+        let custom = action("Custom duration…", #selector(menuCustomDuration))
+        custom.isEnabled = model.phase != .starting
+        entries.append(custom)
+        entries.append(.separator())
+        let counter = action("Show countdown", #selector(menuToggleCountdown))
+        counter.state = manager.config.showCountdown ? .on : .off
+        entries.append(counter)
+        entries.append(.separator())
+        for (index, item) in entries.enumerated() { menu.insertItem(item, at: index) }
+    }
+
+    @objc private func menuPreset(_ sender: NSMenuItem) {
+        guard model.phase != .starting, let duration = sender.representedObject as? NSNumber else { return }
+        run(mode: manager.isActive ? .extend : .start, duration: duration.doubleValue)
+    }
+
+    @objc private func menuCustomDuration() {
+        guard model.phase != .starting else { return }
+        expand(mode: manager.isActive ? .extend : .start)
+    }
+
+    @objc private func menuEndSession() { holdToEnd() }
+
+    @objc private func menuToggleCountdown() {
+        var config = manager.config
+        config.showCountdown.toggle()
+        do {
+            try manager.store.saveConfig(config)
+            manager.config = config
+        } catch {
+            Log.error("could not save config: \(error.localizedDescription)")
+        }
     }
 
     private func menuItems() -> [StatusMenu.Item] {

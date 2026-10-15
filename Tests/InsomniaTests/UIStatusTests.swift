@@ -4,6 +4,50 @@ import XCTest
 
 final class UIStatusTests: XCTestCase {
     @MainActor
+    func testQuickMenuFiltersPresetsAndDisablesStartsWhilePending() {
+        _ = NSApplication.shared
+        let harness = Harness()
+        defer { harness.home.destroy() }
+        let manager = harness.makeManager()
+        manager.config.presets = [-1, 0, 1800, .infinity, manager.config.maxDuration + 1]
+        let controller = StatusItemController(manager: manager, status: PlaceholderStatus(), showSettings: {})
+        func menu() -> NSMenu {
+            let result = NSMenu()
+            controller.addSessionControls(to: result)
+            return result
+        }
+        let idle = menu()
+        XCTAssertEqual(idle.items.filter { $0.representedObject != nil }.map(\.title), ["Stay awake for 30m"])
+        XCTAssertFalse(idle.items.contains { $0.title == "End session" })
+        controller.model.phase = .starting
+        let pending = menu()
+        XCTAssertFalse(pending.items.first { $0.representedObject != nil }!.isEnabled)
+        XCTAssertFalse(pending.items.first { $0.title == "Custom duration…" }!.isEnabled)
+    }
+
+    @MainActor
+    func testCountdownToggleChangesStartingWidthWithoutChangingSessionState() {
+        let harness = Harness()
+        defer { harness.home.destroy() }
+        let manager = harness.makeManager()
+        let model = MenuBarModel()
+        model.phase = .starting
+        model.pendingCountdown = "4:00:00"
+        func width() -> CGFloat {
+            StatusItemController.makeHostingView(StatusRootView(
+                model: model, manager: manager, onTapIcon: {}, onTapPill: { _ in },
+                onTapCountdown: {}, onHoldEnd: {}, onWidthChange: { _ in }
+            )).fittingSize.width
+        }
+        let hidden = width()
+        manager.config.showCountdown = true
+        XCTAssertGreaterThan(width(), hidden)
+        manager.config.showCountdown = false
+        XCTAssertEqual(width(), hidden, accuracy: 0.001)
+        XCTAssertEqual(model.phase, .starting)
+    }
+
+    @MainActor
     func testStatusHostUsesIntrinsicSizingAndHasAnIdleFittingSize() {
         let harness = Harness()
         defer { harness.home.destroy() }

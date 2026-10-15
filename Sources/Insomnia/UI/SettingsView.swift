@@ -271,6 +271,7 @@ struct SettingsView: View {
 
     private var appSection: some View {
         Section("App") {
+            Toggle("Show countdown in menu bar", isOn: bind(\.showCountdown))
             Toggle("Launch at login", isOn: launchAtLogin)
             if let loginItemError {
                 Text(loginItemError).font(.caption).foregroundStyle(.red)
