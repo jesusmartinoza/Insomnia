@@ -92,6 +92,7 @@ struct Config: Codable, Equatable, Sendable {
     /// it. nil on a fresh install, when the update changed nothing, and
     /// after dismissal.
     var lidCloseDefaultsNotice: LidCloseDefaultsChange?
+    var showCountdown: Bool = false
 
     static let defaultPresets: [TimeInterval] = [
         30 * 60,
@@ -163,6 +164,7 @@ struct Config: Codable, Equatable, Sendable {
         nudgeThreshold = try c.decodeIfPresent(TimeInterval.self, forKey: .nudgeThreshold) ?? d.nudgeThreshold
         tmuxTargets = try c.decodeIfPresent([String].self, forKey: .tmuxTargets) ?? d.tmuxTargets
         tmuxNudgePressesEnter = try c.decodeIfPresent(Bool.self, forKey: .tmuxNudgePressesEnter) ?? d.tmuxNudgePressesEnter
+        showCountdown = try c.decodeIfPresent(Bool.self, forKey: .showCountdown) ?? d.showCountdown
         launchAtLogin = try c.decodeIfPresent(Bool.self, forKey: .launchAtLogin) ?? d.launchAtLogin
         launchAtLoginInstall = try c.decodeIfPresent(String.self, forKey: .launchAtLoginInstall)
     }

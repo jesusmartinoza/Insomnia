@@ -32,6 +32,7 @@ final class UIStartupTests: XCTestCase {
             _ = NSApplication.shared
             h = Harness()
             manager = h.makeManager()
+            manager.config.showCountdown = true
             // The manager's fake clock, so the projected countdown reads the
             // same second however late a test reads it.
             let clock = h.clock

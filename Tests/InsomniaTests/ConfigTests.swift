@@ -39,6 +39,7 @@ final class ConfigTests: XCTestCase {
         XCTAssertEqual(c.tmuxTargets, [])
         XCTAssertFalse(c.tmuxNudgePressesEnter)
         XCTAssertFalse(c.launchAtLogin)
+        XCTAssertFalse(c.showCountdown)
     }
 
     /// Enter after `continue` is opt-in: a config.json written before the
@@ -332,6 +333,7 @@ final class ConfigTests: XCTestCase {
         c.hotspotSSID = "iPhone"
         c.tmuxTargets = ["main:0.1"]
         c.presets = [60]
+        c.showCountdown = true
         let data = try Store.makeEncoder().encode(c)
         XCTAssertEqual(try Store.makeDecoder().decode(Config.self, from: data), c)
     }
